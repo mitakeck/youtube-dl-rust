@@ -85,9 +85,7 @@ fn write_file(mut response: Response, title: &str) {
 }
 
 fn parse_url(query: &str) -> HashMap<String, String> {
-    println!("{}", query);
     let u = format!("{}{}", "https://e.com?", query);
-    println!("{}", u);
     let parsed_url = hyper::Url::parse(&u).unwrap();
     parsed_url.query_pairs().into_owned().collect()
 }
