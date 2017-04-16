@@ -69,7 +69,7 @@ fn send_request(url: &str) -> Response {
         .get(url)
         .send()
         .unwrap_or_else(|e| {
-                            println!("Newwork request failed: {}", e);
+                            println!("Network request failed: {}", e);
                             process::exit(1);
                         })
 }
