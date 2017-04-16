@@ -6,9 +6,11 @@ use std::{process, str};
 use hyper::Client;
 use hyper::client::Response;
 use hyper::net::HttpsConnector;
+use hyper::header::{Connection, Headers, UserAgent};
 use hyper_native_tls::NativeTlsClient;
 use std::io::Read;
 use std::io::Write;
+use std::string::String;
 use std::collections::HashMap;
 use std::fs::File;
 
@@ -52,6 +54,7 @@ fn download(url: &str) {
     let extension = &qualities[&input].1;
 
     let response = send_request(url);
+    println!("{}", url);
     println!("Download is starting ...");
 
     let filename = format!("{}.{}", hq["title"], extension);
@@ -65,6 +68,8 @@ fn send_request(url: &str) -> Response {
     let client = Client::with_connector(connector);
     client
         .get(url)
+        .header(Connection::close())
+        .header(UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36".to_string()))
         .send()
         .unwrap_or_else(|e| {
                             println!("Network request failed: {}", e);
@@ -73,21 +78,16 @@ fn send_request(url: &str) -> Response {
 }
 
 fn write_file(mut response: Response, title: &str) {
-    let mut buf = [0; 128 * 1024];
     let mut file = File::create(title).unwrap();
-    loop {
-        match response.read(&mut buf) {
-            Ok(len) => {
-                file.write_all(&buf[..len]).unwrap();
-                len
-            }
-            Err(why) => panic!("{}", why),
-        };
-    }
+    let mut body: Vec<u8> = vec![];
+    response.read_to_end(&mut body).unwrap();
+    file.write_all(&body);
 }
 
 fn parse_url(query: &str) -> HashMap<String, String> {
+    println!("{}", query);
     let u = format!("{}{}", "https://e.com?", query);
+    println!("{}", u);
     let parsed_url = hyper::Url::parse(&u).unwrap();
     parsed_url.query_pairs().into_owned().collect()
 }
