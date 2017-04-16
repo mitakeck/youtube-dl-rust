@@ -5,5 +5,5 @@ youtube-dl-rust
 ## Usage
 
 ```
-$ cargo run
+$ cargo run <youtube-url>
 ```
