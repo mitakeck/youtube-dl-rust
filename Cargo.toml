@@ -1,0 +1,8 @@
+[package]
+name = "youtube-dl-clone"
+version = "0.1.0"
+authors = ["mitakeck <mitake.ck@gmail.com>"]
+
+[dependencies]
+hyper = "*"
+hyper-native-tls = "*"
