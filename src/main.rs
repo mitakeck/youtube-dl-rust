@@ -6,7 +6,6 @@ use std::{process, str};
 use hyper::Client;
 use hyper::client::Response;
 use hyper::net::HttpsConnector;
-use hyper::header::ContentLength;
 use hyper_native_tls::NativeTlsClient;
 use std::io::Read;
 use std::io::Write;
@@ -55,10 +54,9 @@ fn download(url: &str) {
     let response = send_request(url);
     println!("Download is starting ...");
 
-    let file_size = get_file_size(&response);
     let filename = format!("{}.{}", hq["title"], extension);
 
-    write_file(response, &filename, file_size);
+    write_file(response, &filename);
 }
 
 fn send_request(url: &str) -> Response {
@@ -74,7 +72,7 @@ fn send_request(url: &str) -> Response {
                         })
 }
 
-fn write_file(mut response: Response, title: &str, file_size: u64) {
+fn write_file(mut response: Response, title: &str) {
     let mut buf = [0; 128 * 1024];
     let mut file = File::create(title).unwrap();
     loop {
@@ -86,15 +84,6 @@ fn write_file(mut response: Response, title: &str, file_size: u64) {
             Err(why) => panic!("{}", why),
         };
     }
-}
-
-fn get_file_size(response: &Response) -> u64 {
-    let mut file_size = 0;
-    match response.headers.get::<ContentLength>() {
-        Some(length) => file_size = length.0,
-        None => println!("Content-length header missing"),
-    };
-    file_size
 }
 
 fn parse_url(query: &str) -> HashMap<String, String> {
