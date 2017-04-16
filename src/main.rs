@@ -13,10 +13,20 @@ use std::io::Write;
 use std::string::String;
 use std::collections::HashMap;
 use std::fs::File;
+use std::env;
 
 fn main() {
-    let url = "https://youtube.com/get_video_info?video_id=l6zpi90IT1g";
-    download(&url);
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() > 1 {
+        let parsed_url = hyper::Url::parse(&args[1]).unwrap();
+        let video_id: HashMap<_, _> = parsed_url.query_pairs().into_owned().collect();
+        let url = format!("https://youtube.com/get_video_info?video_id={}",
+                          video_id["v"]);
+        download(&url);
+    } else {
+        println!("Specify youtube url");
+    }
 }
 
 fn download(url: &str) {
